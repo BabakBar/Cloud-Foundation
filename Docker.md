@@ -234,3 +234,56 @@ The entrypoint.bash script:
   - `-p` for port mapping (e.g., `-p 8080:80`)
   - `-v` for volume mounts
   - `--name` to assign a container name
+
+## 10. Interacting with Containers (Files/03_06)
+
+### Running Non-Exiting Containers
+
+Unlike previous examples where containers exit immediately after running their entry point commands, some containers (like servers) continue running until explicitly stopped.
+
+#### Building the Container
+```bash
+docker build -f server.Dockerfile -t our-first-server .
+```
+
+#### Running Interactively (Attached)
+```bash
+docker run our-first-server  # Terminal will attach to container
+```
+
+#### Running in Detached Mode
+```bash
+docker run -d our-first-server  # Runs in background
+```
+
+### Managing Running Containers
+
+#### Listing Containers
+```bash
+docker ps  # Shows running containers
+```
+
+#### Stopping Containers
+```bash
+docker kill <container_id>  # First 4 chars usually sufficient
+```
+
+### Interacting with Running Containers
+
+#### Executing Commands
+```bash
+docker exec <container_id> date  # Runs date command
+```
+
+#### Interactive Shell
+```bash
+docker exec -it <container_id> bash  # Starts interactive shell
+```
+
+### Key Learnings
+
+- Server containers run continuously until stopped
+- Use `-d` flag to run containers in background
+- `docker exec` allows interaction with running containers
+- First few characters of container ID are sufficient for commands
+- Interactive shells (`-it`) are useful for debugging
