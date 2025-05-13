@@ -1,146 +1,236 @@
 # Docker Foundation
 
-## Containers vs. Virtual Machines
+## 1. Containers vs Virtual Machines
 
 | Aspect              | Virtual Machines                                   | Containers                                         |
 |---------------------|---------------------------------------------------|----------------------------------------------------|
-| **Virtualization**  | Virtualizes hardware using a hypervisor           | Virtualizes OS kernel using container runtimes     |
-| **Resource Usage**  | Requires more disk space (emulated memory/disks)  | Lightweight, uses less disk space                  |
-| **Startup Time**    | Slower (needs to boot up an OS)                   | Fast (no OS boot required)                         |
-| **Security**        | Strong isolation, separate OS per VM              | Shares host OS, some security concerns (mostly resolved) |
+| **Virtualization**  | Hardware-level (hypervisor)                       | OS-level (container runtime)                       |
+| **Resource Usage**  | High (full OS per VM)                             | Minimal (shared kernel)                            | 
+| **Startup Time**    | Slow (seconds-minutes)                            | Fast (milliseconds)                                |
+| **Isolation**       | Strong (separate OS)                              | Moderate (shared kernel)                           |
+| **Portability**     | Medium (VM-specific)                              | High (standardized)                                |
+| **Use Case**        | Full system isolation                             | Application packaging                              |
 
----
+## 2. Container Architecture
 
-## The Anatomy of a Container
+### Key Components
 
-- **Components:**
-  - **Linux Namespace:** Provides isolated views of the system for each container (all except TIME namespace used by Docker).
-  - **Linux Control Group (cgroup):** Restricts and monitors hardware resources (CPU, memory, network bandwidth) for each process.
+- **Linux Namespaces** - Provides isolated views of system resources
+  - PID, Network, Mount, IPC, UTS, User namespaces
+- **Control Groups (cgroups)** - Resource limits and monitoring
+  - CPU, memory, disk I/O, network bandwidth
 
----
+## 3. Docker Advantages
 
-## The Docker Difference
+### Why Docker Stands Out
 
-- **Historical Context:**
-  - Docker is not the first container technology (predecessors: Chroot, BSD Jails, Solaris Zones, LXC).
-- **Ease of Use:**
-  - Dockerfiles make it easy to package applications and environments into images.
-- **Image Sharing:**
-  - Docker Hub enables global sharing of images; alternative registries are available.
-- **User-Friendly CLI:**
-  - The Docker CLI simplifies container management without complex configuration.
+- **Simplified Packaging** - Dockerfiles standardize application packaging
+- **Ecosystem** - Docker Hub for image sharing and distribution
+- **Developer Experience** - Intuitive CLI and tooling
+- **Cross-platform** - Consistent environment across development/production
 
-> These points highlight why Docker is a popular choice for containerization.
+> Historical note: Built on earlier tech (chroot, LXC) but with improved UX
 
----
+## 4. Docker Alternatives
 
-## Docker Main Alternatives
+| Tool             | Key Differentiator                     |
+|------------------|----------------------------------------|
+| **Podman**       | Rootless, daemonless architecture      |
+| **Colima**       | macOS-optimized Docker alternative     |
+| **Rancher**      | Kubernetes-focused container platform  |
 
-- Colima
-- Rancher Desktop
-- Podman
+## 5. Essential Commands
 
----
+### Basic Operations
 
-## Useful Commands
+```bash
+# Version and help
+docker --version
+docker --help
+docker <command> --help
 
-```sh
-docker --version         # Check Docker version
-docker ps                # List running containers
-docker run hello-world   # Run a test container
-docker --help            # Get help for Docker CLI
-# You can run help for any command:
-docker network --help
+# Container lifecycle
+docker run <image>          # Create+start+attach
+docker ps                   # List running containers
+docker ps -a                # List all containers
+docker start/stop <container>
+docker rm <container>       # Remove container
+docker logs <container>     # View logs
 ```
 
----
+### Image Management
 
-## Creating and Managing Docker Containers
+```bash
+docker pull <image>         # Download image
+docker images               # List local images
+docker rmi <image>          # Remove image
+```
 
-### Creating Containers
+## 6. Container Lifecycle
 
-- **Command:**
+### Detailed Workflow
 
-  ```sh
-  docker container create <image>:<tag>
+1. **Image Pull** (if not local):
+
+   ```bash
+   docker pull nginx:alpine
+   ```
+
+2. **Container Creation**:
+
+   ```bash
+   docker create --name web nginx:alpine
+   ```
+
+3. **Container Start**:
+
+   ```bash
+   docker start web
+   ```
+
+4. **Interaction**:
+
+   ```bash
+   docker exec -it web sh   # Get shell
+   docker logs web          # View output
+   ```
+
+### Shortcut: docker run
+
+```bash
+docker run -d -p 8080:80 --name web nginx:alpine
+```
+
+Equivalent to: `create` + `start` + optional port mapping
+
+## 7. Important Missing Topics
+
+The following key Docker concepts should be added:
+
+1. **Networking**
+   - Bridge networks
+   - Host networking
+   - Custom networks
+
+2. **Storage**
+   - Volumes vs bind mounts
+   - tmpfs mounts
+
+3. **Multi-stage Builds**
+   - Reducing image size
+   - Build-time vs runtime dependencies
+
+4. **Docker Compose**
+   - Multi-container applications
+   - Service definitions
+
+5. **Best Practices**
+   - Minimal base images
+   - Proper layer caching
+   - Security scanning
+
+## 8. Tips & Tricks
+
+- Use partial container IDs (first 3 chars usually sufficient):
+
+  ```bash
+  docker logs 4cc   # Instead of full ID
   ```
 
-  - If the image is not available locally, Docker will automatically pull it from Docker Hub.
-  - Example:
+- Clean up unused resources:
 
-    ```sh
-    docker container create hello-world:linux
-    ```
-
-    Output:
-
-    ```
-    Unable to find image 'hello-world:linux' locally
-    linux: Pulling from library/hello-world
-    Digest: sha256:a77ecd852b17bfaee6708208960645d20fc9e6d0eec12353f8eb0e7b94bb647a
-    Status: Downloaded newer image for hello-world:linux
-    4cc89b1f11d9b553ba6fb682653385e85f44ef54ca1701476d7ec845eece8e53
-    ```
-
-  - The last line is the **container ID** (unique identifier for the container).
-
-### Listing Containers
-
-- **List running containers:**
-
-  ```sh
-  docker ps
+  ```bash
+  docker system prune
   ```
 
-- **List all containers (including stopped):**
+- View detailed container info:
 
-  ```sh
-  docker ps --all
-  ```
+  ```bash
+  docker inspect <container>
 
-### Starting Containers
+## 9. Example Dockerfile Analysis (Files/03_05)
 
-- **Start a container by ID:**
+Create a Docker container from Dockerfiles, part 1," here are the key takeaways:
 
-  ```sh
-  docker container start <container_id>
-  ```
+Building Docker Images: Learn how to build Docker images from Dockerfiles, which are scripts that contain instructions for creating a Docker image.
+Key Dockerfile Commands: Understand important Dockerfile commands such as FROM, USER, COPY, RUN, and ENTRYPOINT, which help in defining the base image, user permissions, copying files, running commands, and setting the default command for the container.
+Security Practices: the importance of using non-root users for running commands to enhance security.
 
-  - Example:
+example: Files\03_05\Dockerfile
 
-    ```sh
-    docker container start 4cc89b1f11d9b553ba6fb682653385e85f44ef54ca1701476d7ec845eece8e53
-    ```
+### Dockerfile Breakdown
 
-- **Start and attach to a container (see output in terminal):**
+```dockerfile
+FROM ubuntu
+- Starts with Ubuntu base image
 
-  ```sh
-  docker container start --attach <container_id>
-  ```
+LABEL maintainer="Carlos Nunez <dev@carlosnunez.me>"
+- Metadata about maintainer
 
-  - If you omit the container ID, Docker will show a usage message.
+USER root
+- Runs subsequent commands as root
 
-### Viewing Container Logs
+COPY ./entrypoint.bash /
+# Copies entrypoint script into container
 
-- **Show logs for a container:**
+RUN apt -y update
+RUN apt -y install curl bash
+- Updates packages and installs curl/bash
 
-  ```sh
-  docker logs <container_id>
-  ```
+RUN chmod 755 /entrypoint.bash
+- Makes entrypoint executable
 
-  - Example output for `hello-world`:
+USER nobody
+- Switches to unprivileged user for security
 
-    ```
-    Hello from Docker!
-    This message shows that your installation appears to be working correctly.
-    ...
-    ```
+ENTRYPOINT [ "/entrypoint.bash" ]
+```
 
-#### What Happens When You Create and Start a Container?
+- Sets default command to run entrypoint script
 
-1. Docker checks for the image locally; if not found, it pulls from Docker Hub.
-2. Docker creates a new container from the image, assigning a unique container ID.
-3. When started, the container runs its default command (e.g., `/hello` for `hello-world`).
-4. You can view the output using `docker logs` or by attaching to the container.
+### Entrypoint Script Analysis
 
----
+The entrypoint.bash script:
+
+1. Checks for bash version 5
+2. Verifies curl is installed
+3. Gets current date from google.com
+4. Prints greeting with current date
+
+### Key Learnings
+
+- Shows multi-stage container setup (root for setup, nobody for runtime)
+- Demonstrates proper package installation
+- Illustrates entrypoint pattern for container initialization
+- Shows security best practices (non-root user)
+
+
+
+## Docker Basics
+
+### Building Docker Images
+
+- Use the `docker build` command to create a Docker image from a Dockerfile
+- The `-t` option tags the image with a convenient name (e.g., `docker build -t myapp .`)
+
+### Context and Dockerfile
+
+- Docker looks for a file named `Dockerfile` by default in the current directory
+- Uses the build context (the folder containing files) to construct the image
+- Can specify a different Dockerfile with `-f` flag (e.g., `docker build -f custom.Dockerfile .`)
+
+### Layered Images
+
+- Docker images are built in layers
+- Each command in the Dockerfile creates an intermediate image layer
+- Layers are cached and reused for faster subsequent builds
+- Final image combines all layers into a single immutable artifact
+
+### Running Containers
+
+- After building, run a container with `docker run` followed by the image name
+- Common options:
+  - `-d` for detached mode (background)
+  - `-p` for port mapping (e.g., `-p 8080:80`)
+  - `-v` for volume mounts
+  - `--name` to assign a container name
