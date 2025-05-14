@@ -147,6 +147,7 @@ The following key Docker concepts should be added:
 
   ```bash
   docker inspect <container>
+  ```
 
 ## 9. Example Dockerfile Analysis (Files/03_05)
 
@@ -203,8 +204,6 @@ The entrypoint.bash script:
 - Demonstrates proper package installation
 - Illustrates entrypoint pattern for container initialization
 - Shows security best practices (non-root user)
-
-
 
 ## Docker Basics
 
@@ -287,3 +286,63 @@ docker exec -it <container_id> bash  # Starts interactive shell
 - `docker exec` allows interaction with running containers
 - First few characters of container ID are sufficient for commands
 - Interactive shells (`-it`) are useful for debugging
+
+## 11. Stopping and Removing Containers and Images
+
+Managing containers and images is essential to keep your system clean and efficient. Docker does not automatically remove stopped containers or unused images, so manual cleanup is often necessary.
+
+### Stopping Containers
+
+- **Graceful Stop:**
+  ```bash
+  docker stop <container_id>
+  # Example: docker stop 79f6
+  ```
+  This attempts to gracefully stop the running process inside the container. It may take up to 10 seconds if the application is slow to exit.
+
+- **Forceful Stop:**
+  ```bash
+  docker stop -t 0 <container_id>
+  # Example: docker stop -t 0 79f6
+  ```
+  The `-t 0` option tells Docker to immediately stop the container. Use with caution, as this can cause data loss.
+
+### Removing Containers
+
+- **Remove a Single Container:**
+  ```bash
+  docker rm <container_id>
+  # Example: docker rm 79f6
+  ```
+  Note: You cannot remove a running container without the `-f` (force) flag.
+
+- **Force Remove a Running Container:**
+  ```bash
+  docker rm -f <container_id>
+  ```
+
+- **Remove All Stopped Containers (Batch):**
+  ```bash
+  docker ps -a -q | xargs docker rm
+  ```
+  
+  ```powershell
+  docker ps -a -q | ForEach-Object { docker rm $_ }
+   ```
+  This command lists all container IDs and removes them in one go using `xargs`.
+
+### Removing Images
+
+- **Remove a Single Image:**
+  ```bash
+  docker rmi <image_name>
+  # Example: docker rmi our-server
+  ```
+  If the image is in use by a running container, stop the container first. Use `-f` to force removal, but be aware this can cause issues if containers depend on the image.
+
+---
+
+**Tip:** Regularly cleaning up unused containers and images helps free disk space and keeps your Docker environment tidy.
+
+> **Warning:** Forceful removal (`-f`) can cause data loss or unpredictable behavior. Always double-check before using it.
+````
