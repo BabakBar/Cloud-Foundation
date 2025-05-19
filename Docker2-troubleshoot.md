@@ -299,3 +299,101 @@ failed to pull image ubuntu:xeniall: not found
 - Use Docker's built-in tools (`stats`, `top`, `inspect`) for troubleshooting
 - Remove and recreate containers when testing fixes
 - Keep container names unique or use the `--rm` flag for temporary containers
+
+## Taking it to the Next Level with Docker Compose
+
+### The Multi-Container Challenge
+
+While Docker excels at running single applications, modern architectures often require multiple interconnected services. Consider a typical three-tier web application:
+
+- Frontend web application
+- Backend API/application server
+- Database server
+
+### Common Approaches and Their Limitations
+
+1. **Single Container Approach**
+   - ❌ Putting everything in one container
+   - Problems:
+     - Violates single responsibility principle
+     - Risk of data loss
+     - Unpredictable behavior
+     - Difficult to scale individual components
+
+2. **Manual Multi-Container Setup**
+   - ✅ Running separate containers
+   - ✅ Using Docker networks for communication
+   - ✅ Managing data with Docker volumes
+   - Problems:
+     - Complex CLI commands
+     - Tedious to manage
+     - Error-prone manual setup
+
+### Enter Docker Compose
+
+Docker Compose is a powerful tool that simplifies multi-container application management on a single host. Key benefits:
+
+- Define entire application stack in a single file
+- Manage multiple containers as one unit
+- Simplify container networking
+- Handle data persistence consistently
+- Easy development and testing environments
+
+### How it Works
+
+1. **Compose Manifest**
+   - Single YAML file (usually `docker-compose.yml`)
+   - Defines all services, networks, and volumes
+   - Specifies relationships between containers
+
+2. **Basic Commands**
+
+   ```bash
+   # Start all services
+   docker-compose up
+
+   # Start in detached mode
+   docker-compose up -d
+
+   # Stop all services
+   docker-compose down
+   ```
+
+### Example Use Cases
+
+1. **Local Development**
+   - Run entire application stack locally
+   - Consistent environment across team
+   - No need for external dependencies
+
+2. **Testing**
+   - Integration testing
+   - End-to-end testing
+   - Isolated test environments
+   - Network-independent testing
+
+3. **CI/CD Pipelines**
+   - Automated testing
+   - Staging environments
+   - Pre-production validation
+
+### Docker Compose Resources
+
+Visit [Docker Compose documentation](https://docs.docker.com/compose/) to learn more about:
+
+- Installation
+- Configuration file syntax
+- CLI commands
+- Best practices
+- Example configurations
+
+### Compose Best Practices
+
+- Keep services focused and single-purpose
+- Use environment variables for configuration
+- Define explicit container dependencies
+- Use named volumes for persistent data
+- Document networking requirements
+- Include proper healthchecks
+
+By using Docker Compose, you can simplify the management of complex, multi-container applications and focus on development rather than infrastructure configuration.
