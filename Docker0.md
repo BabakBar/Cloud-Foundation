@@ -5,7 +5,7 @@
 | Aspect              | Virtual Machines                                   | Containers                                         |
 |---------------------|---------------------------------------------------|----------------------------------------------------|
 | **Virtualization**  | Hardware-level (hypervisor)                       | OS-level (container runtime)                       |
-| **Resource Usage**  | High (full OS per VM)                             | Minimal (shared kernel)                            | 
+| **Resource Usage**  | High (full OS per VM)                             | Minimal (shared kernel)                            |
 | **Startup Time**    | Slow (seconds-minutes)                            | Fast (milliseconds)                                |
 | **Isolation**       | Strong (separate OS)                              | Moderate (shared kernel)                           |
 | **Portability**     | Medium (VM-specific)                              | High (standardized)                                |
@@ -95,13 +95,19 @@ docker rmi <image>          # Remove image
    docker logs web          # View output
    ```
 
-### Shortcut: docker run
+### Understanding docker run
 
 ```bash
 docker run -d -p 8080:80 --name web nginx:alpine
 ```
 
-Equivalent to: `create` + `start` + optional port mapping
+`docker run` is a convenience command that combines three Docker commands into one:
+
+1. `docker pull` (if image not present locally)
+2. `docker create` (creates a new container)
+3. `docker start` (starts the container)
+
+It also supports additional options like port mapping (`-p`), name assignment (`--name`), and detached mode (`-d`).
 
 ## 7. Important Missing Topics
 
@@ -241,16 +247,19 @@ The entrypoint.bash script:
 Unlike previous examples where containers exit immediately after running their entry point commands, some containers (like servers) continue running until explicitly stopped.
 
 #### Building the Container
+
 ```bash
 docker build -f server.Dockerfile -t our-first-server .
 ```
 
 #### Running Interactively (Attached)
+
 ```bash
 docker run our-first-server  # Terminal will attach to container
 ```
 
 #### Running in Detached Mode
+
 ```bash
 docker run -d our-first-server  # Runs in background
 ```
@@ -258,11 +267,13 @@ docker run -d our-first-server  # Runs in background
 ### Managing Running Containers
 
 #### Listing Containers
+
 ```bash
 docker ps  # Shows running containers
 ```
 
 #### Stopping Containers
+
 ```bash
 docker kill <container_id>  # First 4 chars usually sufficient
 ```
@@ -270,14 +281,31 @@ docker kill <container_id>  # First 4 chars usually sufficient
 ### Interacting with Running Containers
 
 #### Executing Commands
+
 ```bash
 docker exec <container_id> date  # Runs date command
 ```
 
-#### Interactive Shell
+#### Interactive Shell Sessions
+
 ```bash
 docker exec -it <container_id> bash  # Starts interactive shell
 ```
+
+The `docker exec` command runs a new command inside a running container. When used with `-i` and `-t` flags, it's particularly useful for getting an interactive shell:
+
+- `-i` or `--interactive`: Keep STDIN open (allows you to type commands)
+- `-t` or `--tty`: Allocates a pseudo-TTY (provides a terminal interface)
+- `<container_id>`: First few characters of container ID (e.g., "2bf")
+- `bash`: The command to run (in this case, starts a bash shell)
+
+For example, `docker exec -i -t 2bf bash` will:
+
+1. Connect to the container with ID starting with "2bf"
+2. Start an interactive bash shell session
+3. Give you a terminal interface just like SSH-ing into a remote machine
+
+> **Tip:** The `-it` flags are commonly used together and can be combined as one flag: `-it`
 
 ### Key Learnings
 
@@ -294,34 +322,42 @@ Managing containers and images is essential to keep your system clean and effici
 ### Stopping Containers
 
 - **Graceful Stop:**
+
   ```bash
   docker stop <container_id>
   # Example: docker stop 79f6
   ```
+
   This attempts to gracefully stop the running process inside the container. It may take up to 10 seconds if the application is slow to exit.
 
 - **Forceful Stop:**
+
   ```bash
   docker stop -t 0 <container_id>
   # Example: docker stop -t 0 79f6
   ```
+
   The `-t 0` option tells Docker to immediately stop the container. Use with caution, as this can cause data loss.
 
 ### Removing Containers
 
 - **Remove a Single Container:**
+
   ```bash
   docker rm <container_id>
   # Example: docker rm 79f6
   ```
+
   Note: You cannot remove a running container without the `-f` (force) flag.
 
 - **Force Remove a Running Container:**
+
   ```bash
   docker rm -f <container_id>
   ```
 
 - **Remove All Stopped Containers (Batch):**
+
   ```bash
   docker ps -a -q | xargs docker rm
   ```
@@ -329,15 +365,18 @@ Managing containers and images is essential to keep your system clean and effici
   ```powershell
   docker ps -a -q | ForEach-Object { docker rm $_ }
    ```
+
   This command lists all container IDs and removes them in one go using `xargs`.
 
 ### Removing Images
 
 - **Remove a Single Image:**
+
   ```bash
   docker rmi <image_name>
   # Example: docker rmi our-server
   ```
+
   If the image is in use by a running container, stop the container first. Use `-f` to force removal, but be aware this can cause issues if containers depend on the image.
 
 ---
@@ -345,4 +384,5 @@ Managing containers and images is essential to keep your system clean and effici
 **Tip:** Regularly cleaning up unused containers and images helps free disk space and keeps your Docker environment tidy.
 
 > **Warning:** Forceful removal (`-f`) can cause data loss or unpredictable behavior. Always double-check before using it.
-````
+
+`````````
