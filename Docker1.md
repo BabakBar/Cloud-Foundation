@@ -237,3 +237,49 @@ If you want to remove an image or repository:
 ---
 
 > **Tip:** Use tags to manage different versions of your images. Delete test images from Docker Hub to keep your account organized.
+
+## Challenge: Starting NGINX
+
+In this challenge, you'll use Docker to serve a real website using the official NGINX image. The goal is to make the website accessible at [http://localhost:8080](http://localhost:8080) and ensure the container is removed after use.
+
+### Steps
+
+1. **Navigate to the correct folder**
+
+   Make sure you are in the `03_14` folder, which contains the `website` directory:
+
+   ```powershell
+   cd Files/03_14_before
+   ```
+
+2. **Run the NGINX container with volume mount and port mapping**
+
+   Use the following command to start the container:
+
+   ```powershell
+   docker run --rm -d --name website -p 8080:80 -v ${PWD}/website:/usr/share/nginx/html nginx
+   ```
+
+   - `--rm` removes the container after it stops.
+   - `-d` runs the container in detached mode.
+   - `--name website` names the container for easy management.
+   - `-p 8080:80` maps port 8080 on your host to port 80 in the container.
+   - `-v ${PWD}/website:/usr/share/nginx/html` mounts the local `website` folder to the NGINX web root.
+
+3. **View the website**
+
+   Open your browser and go to [http://localhost:8080](http://localhost:8080) to see the website served by NGINX.
+
+4. **Stop and remove the container**
+
+   When you're done, stop the container:
+
+   ```powershell
+   docker stop website
+   ```
+
+   Since you used `--rm`, the container will be removed automatically.
+
+---
+
+> **Tip:** Using `--rm` ensures your container is cleaned up after use. Volume mounts let you serve static content directly from your project folder.
