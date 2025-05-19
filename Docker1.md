@@ -283,3 +283,56 @@ In this challenge, you'll use Docker to serve a real website using the official 
 ---
 
 > **Tip:** Using `--rm` ensures your container is cleaned up after use. Volume mounts let you serve static content directly from your project folder.
+
+### Solution: Starting NGINX
+
+Let's work through solving this challenge step by step.
+
+1. **Understanding the Requirements**
+   - Use the official NGINX image from Docker Hub (no Dockerfile needed)
+   - Name the container "website"
+   - Make the site accessible at [http://localhost:8080](http://localhost:8080)
+   - Use volume mounting for the static site
+   - Container should delete itself after stopping
+
+2. **Building the Docker Command**
+
+   Let's break down the command piece by piece:
+
+   ```powershell
+   docker run --name website -v "${PWD}/website:/usr/share/nginx/html" -p 8080:80 --rm nginx
+   ```
+
+   - `docker run`: Start a new container
+   - `--name website`: Name the container "website"
+   - `-v "${PWD}/website:/usr/share/nginx/html"`: Mount our local website folder
+     - `${PWD}/website` is the outside (host) path
+     - `/usr/share/nginx/html` is the inside (container) path
+     - Quotes around the volume mount help prevent path issues
+   - `-p 8080:80`: Map ports
+     - `8080` is the outside (host) port
+     - `80` is the inside (container) port where NGINX serves
+   - `--rm`: Remove the container when it stops
+   - `nginx`: The official NGINX image from Docker Hub
+
+3. **Verifying the Container**
+
+   After running the container and viewing the website, you can check its status:
+
+   ```powershell
+   docker ps -a
+   ```
+
+   - The `-a` flag shows all containers, including stopped ones
+   - If using `--rm`, the container won't appear after stopping
+
+4. **Common Issues and Solutions**
+   - If the volume mount fails, try using quotes around the path
+   - If the website doesn't load, check that your ports match (8080:80)
+   - No need to modify NGINX configuration for basic static sites
+
+Congratulations! You've successfully served a static website using Docker and NGINX. This pattern is commonly used in development environments and for serving static content in production.
+
+---
+
+> **Tip:** The `--rm` flag is useful during development to keep your system clean, but in production, you might want to keep containers around for logging and debugging.
