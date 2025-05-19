@@ -199,3 +199,41 @@ docker push <your-username>/our-web-server:0.0.1
 > **Tip:** Use version tags (like `:0.0.1`) to keep track of different versions of your images. Avoid using only `:latest` for everything.
 
 > **Security:** Store your Docker Hub credentials securely, such as in a password manager.
+
+## Checking Your Images in Docker Hub
+
+After pushing your image to Docker Hub, you can verify and manage it through the Docker Hub website.
+
+### 1. View Your Image in Docker Hub
+
+- Go to [Docker Hub](https://hub.docker.com/) and sign in.
+- On your dashboard, you'll see a list of your repositories (images).
+- Click on your image (e.g., `our-web-server`) to view its details.
+- Here, you can see all the tags you've pushed, the compatible operating systems, and the last push date.
+- If you have many tags, click **See all** to view them.
+
+### 2. Pushing a New Tag
+
+You can push additional tags for the same image. For example, to add a new version:
+
+```powershell
+docker tag our-web-server <your-username>/our-web-server:0.0.2
+
+docker push <your-username>/our-web-server:0.0.2
+```
+
+- Docker will only upload new layers if the image has changed. If not, the push will be very fast.
+- Refresh your Docker Hub repository page to see the new tag appear.
+
+### 3. Deleting an Image or Repository
+
+If you want to remove an image or repository:
+
+- This must be done from the Docker Hub website (not the CLI).
+- Go to your repository, click **Settings**, then **Delete repository**.
+- When prompted, enter only the repository name (e.g., `our-web-server`), not the full tag.
+- Confirm the deletion. The repository and all its tags will be removed.
+
+---
+
+> **Tip:** Use tags to manage different versions of your images. Delete test images from Docker Hub to keep your account organized.
