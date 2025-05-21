@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Foundation Roadmap - Interactive Mermaid Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0d6efd;
+            margin-top: 0;
+        }
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0b5ed7;
+        }
+        #diagram {
+            width: 100%;
+            overflow: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+        }
+        /* This is important to make the diagram bigger */
+        #diagram svg {
+            min-width: 1200px;
+            height: auto;
+        }
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e2e3e5;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions ul {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cloud Foundation Roadmap - Interactive Diagram</h1>
+        
+        <div class="controls">
+            <button id="zoomIn">Zoom In (+)</button>
+            <button id="zoomOut">Zoom Out (-)</button>
+            <button id="resetZoom">Reset Zoom</button>
+            <button id="savePNG">Save as PNG</button>
+            <button id="saveSVG">Save as SVG</button>
+        </div>
+        
+        <div id="diagram">
+            <pre class="mermaid">
+graph TD
+    %% Main Cloud Skills Roadmap
+    Cloud[Cloud Foundation Roadmap] --> Linux[1. Linux Basics]
+    Cloud --> AWS[2. AWS Cloud Fundamentals]
+    Cloud --> Git[3. Source Control with Git/GitHub]
+    Cloud --> Terraform[4. Infrastructure as Code with Terraform]
+    Cloud --> Docker[5. Containers with Docker]
+    Cloud --> CICD[6. CI/CD with GitHub Actions]
+    Cloud --> Ansible[7. Configuration Management with Ansible]
+    
+    %% Linux Basics
+    Linux --> L1[1.1 Terminal Basics]
+    Linux --> L2[1.2 File System Navigation]
+    Linux --> L3[1.3 Process Management]
+    Linux --> L4[1.4 Package Management]
+    Linux --> L5[1.5 Bash Scripting]
+    
+    %% AWS Cloud Fundamentals
+    AWS --> A1[IAM]
+    AWS --> A2[Compute Services]
+    AWS --> A3[VPC]
+    AWS --> A4[S3]
+    
+    %% Git/GitHub
+    Git --> G1[Basic Git Commands]
+    Git --> G2[Repository Management]
+    Git --> G3[Branching Workflows]
+    
+    %% Terraform
+    Terraform --> T1[Terraform Basics]
+    Terraform --> T2[Server Creation]
+    Terraform --> T3[Scaling]
+    Terraform --> T4[Advanced Resources]
+    Terraform --> T5[Modules]
+    
+    %% Docker
+    Docker --> D1[Docker Architecture]
+    Docker --> D2[Docker CLI]
+    Docker --> D3[Dockerfile Basics]
+    Docker --> D4[Docker Compose]
+    Docker --> D5[Docker in CI/CD]
+    
+    %% CI/CD with GitHub Actions
+    CICD --> C1[Basic Workflows]
+    CICD --> C2[Advanced Workflows]
+    CICD --> C3[Custom Runners]
+    
+    %% Ansible
+    Ansible --> AN1[Ansible Basics]
+    Ansible --> AN2[Creating/Running Playbooks]
+    Ansible --> AN3[Advanced Playbooks]
+    Ansible --> AN4[Dynamic Inventory]
+    
+    %% Style definitions
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef main fill:#d1e7dd,stroke:#0d6efd,stroke-width:2px,color:#0d6efd
+    classDef section fill:#e2e3e5,stroke:#6c757d,stroke-width:2px
+    
+    %% Apply styles
+    class Cloud main
+    class Linux,AWS,Git,Terraform,Docker,CICD,Ansible section
+            </pre>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ul>
+                <li><strong>Zoom Controls:</strong> Use the buttons above to zoom in/out or reset the zoom level.</li>
+                <li><strong>Save as Image:</strong> Click "Save as PNG" or "Save as SVG" to download the diagram.</li>
+                <li><strong>Interact:</strong> You can click and drag to pan around the diagram.</li>
+                <li><strong>VS Code Extensions:</strong> For permanent better viewing, consider installing the "Markdown Preview Mermaid Support" extension.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true
+            }
+        });
+
+        // Get elements
+        const diagram = document.getElementById('diagram');
+        const zoomIn = document.getElementById('zoomIn');
+        const zoomOut = document.getElementById('zoomOut');
+        const resetZoom = document.getElementById('resetZoom');
+        const savePNG = document.getElementById('savePNG');
+        const saveSVG = document.getElementById('saveSVG');
+        
+        // Variables to track zoom level
+        let currentZoom = 1;
+        const zoomFactor = 0.1;
+        const minZoom = 0.5;
+        const maxZoom = 2;
+        
+        // Wait for diagram to render
+        window.addEventListener('load', function() {
+            // Add a little delay to ensure the SVG is fully rendered
+            setTimeout(() => {
+                const svg = diagram.querySelector('svg');
+                if (svg) {
+                    // Set initial size
+                    svg.style.transform = `scale(${currentZoom})`;
+                    svg.style.transformOrigin = 'top left';
+                }
+            }, 1000);
+        });
+        
+        // Zoom in function
+        zoomIn.addEventListener('click', () => {
+            if (currentZoom < maxZoom) {
+                currentZoom += zoomFactor;
+                applyZoom();
+            }
+        });
+        
+        // Zoom out function
+        zoomOut.addEventListener('click', () => {
+            if (currentZoom > minZoom) {
+                currentZoom -= zoomFactor;
+                applyZoom();
+            }
+        });
+        
+        // Reset zoom function
+        resetZoom.addEventListener('click', () => {
+            currentZoom = 1;
+            applyZoom();
+        });
+        
+        // Apply zoom to SVG
+        function applyZoom() {
+            const svg = diagram.querySelector('svg');
+            if (svg) {
+                svg.style.transform = `scale(${currentZoom})`;
+            }
+        }
+        
+        // Save as PNG
+        savePNG.addEventListener('click', () => {
+            const svg = diagram.querySelector('svg');
+            if (!svg) return;
+            
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Create an image to draw to canvas
+            const img = new Image();
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                // Download the PNG
+                const a = document.createElement('a');
+                a.download = 'cloud-roadmap.png';
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            };
+            
+            // Load the SVG data
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        });
+        
+        // Save as SVG
+        saveSVG.addEventListener('click', () => {
+            const svg = diagram.querySelector('svg');
+            if (!svg) return;
+            
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const svgUrl = URL.createObjectURL(svgBlob);
+            
+            const a = document.createElement('a');
+            a.download = 'cloud-roadmap.svg';
+            a.href = svgUrl;
+            a.click();
+            
+            URL.revokeObjectURL(svgUrl);
+        });
+    </script>
+</body>
+</html>
