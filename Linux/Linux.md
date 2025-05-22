@@ -71,3 +71,137 @@
         read instance_name
         echo "You entered: $instance_name"
         ```
+
+### Users, Groups, and Permissions
+
+1. **`whoami` command:** Displays the current user's username.
+    * Example: `whoami`
+2. **UID (User ID):** A unique number assigned to each user. The system uses UIDs to identify users.
+    * View your UID: `id -u`
+3. **Root User (UID 0):** The superuser or administrator account. It has unrestricted access to the entire system. The username is typically `root`.
+4. **`su` (substitute user) command:** Switches to another user account. If no username is specified, it defaults to `root` (requires the root password).
+    * Example: `su - anotheruser` (switches to `anotheruser` with their environment)
+    * Example: `su -` (switches to `root` with root's environment)
+5. **`sudo` (superuser do) command:** Allows a permitted user to execute a command as the superuser or another user, as specified by the security policy (typically in `/etc/sudoers`). This is the preferred way to run commands with elevated privileges for specific tasks, rather than logging in as `root` directly.
+    * Example: `sudo apt update` (runs `apt update` as root)
+6. **Groups:** Users can be members of groups. Permissions can be assigned to groups, making it easier to manage access for multiple users. Each group also has a **GID (Group ID)**.
+    * View your primary GID: `id -g`
+    * View all groups you belong to: `groups` or `id`
+7. **File Permissions (Symbolic Notation):** When you list files with `ls -l`, the first 10 characters represent the file type and permissions (e.g., `-rwxr-xr--`).
+    * The first character indicates file type (`-` for regular file, `d` for directory, `l` for symbolic link).
+    * The next nine characters are in three sets of three:
+        * **Owner permissions** (first set of `rwx`)
+        * **Group permissions** (second set of `rwx`)
+        * **Other (everyone else) permissions** (third set of `rwx`)
+    * `r` = read permission
+    * `w` = write permission
+    * `x` = execute permission (for files, allows running; for directories, allows entering)
+    * A hyphen (`-`) means the permission is not granted.
+8. **File Permissions (Octal Notation):** Permissions can also be represented by a 3-digit octal number (e.g., `754`). Each digit represents a set of permissions (owner, group, other):
+    * Read (r) = 4
+    * Write (w  2
+    * Execute (x) = 1
+    * Sum these numbers for the desired permissions for each category.
+        * `7` = `rwx` (4+2+1)
+        * `6` = `rw-` (4+2)
+        * `5` = `r-x` (4+1)
+        * `4` = `r--` (4)
+        * `0` = `---` (0)
+    * Example: `rwxr-xr--` translates to `754`.
+9. **`chmod` (change mode) command:** Modifies file permissions. Can use symbolic or octal notation.
+    * Symbolic Example: `chmod u+x my_script.sh` (adds execute permission for the user/owner)
+    * Symbolic Example: `chmod g-w config.file` (removes write permission for the group)
+    * Symbolic Example: `chmod o=r public_data.txt` (sets other permissions to read-only)
+    * Symbolic Example: `chmod a+r file.txt` (adds read permission for all: user, group, and other)
+    * Octal Example: `chmod 755 my_script.sh` (sets `rwxr-xr-x`)
+10. **`chown` (change owner) command:** Changes the owner of a file or directory. Usually requires `sudo`.
+    * Example: `sudo chown newuser:newgroup somefile.txt` (changes owner to `newuser` and group to `newgroup`)
+    * Example: `sudo chown newuser somefile.txt` (changes only owner to `newuser`)
+11. **`chgrp` (change group) command:** Changes the group ownership of a file or directory. Usually requires `sudo`.
+    * Example: `sudo chgrp newgroup somefile.txt`
+12. **Principle of Least Privilege:** A fundamental security concept. Users and processes should only have the minimum permissions necessary to perform their tasks. Avoid using `root` or overly permissive settings like `777` unless absolutely necessary and understood.
+
+### Key File System Directories
+
+Linux has a standard file system hierarchy. Here are some important directories for a cloud engineer:
+
+1. **`/` (Root Directory):** The top-level directory in the Linux file system. Everything is under `/`.
+2. **`/home`:** Contains the personal directories for users. For example, `/home/cloud_user`.
+3. **`/boot`:** Contains files needed to boot the system, including the Linux kernel itself.
+4. **`/dev`:** Contains device files that represent hardware devices (e.g., hard drives `/dev/sda`, terminals `/dev/tty`).
+5. **`/etc` (et cetera):** Contains system-wide configuration files. You'll often edit files here (e.g., `/etc/ssh/sshd_config`, `/etc/nginx/nginx.conf`).
+6. **`/var` (variable):** Contains files that are expected to grow in size, such as logs (`/var/log`), mail spools, and temporary files. Critical for monitoring and troubleshooting.
+7. **`/bin` (binaries):** Contains essential user command binaries that are available to all users (e.g., `ls`, `cp`, `mv`).
+8. **`/sbin` (system binaries):** Contains essential system binaries, typically run by the root user for system administration tasks (e.g., `fdisk`, `iptables`).
+9. **`/usr` (Unix System Resources):** Contains shareable, read-only data. This includes user binaries (`/usr/bin`), libraries (`/usr/lib`), and documentation. Not to be confused with user home directories.
+    * `/usr/local/bin`: Often used for programs compiled from source that are not part of the core distribution.
+10. **`/tmp` (temporary):** A directory for temporary files. Files here may be deleted upon reboot.
+
+### Environment Variables and Shell Customization
+
+1. **`PATH` Environment Variable:** An environment variable that tells the shell which directories to search for executable files when you type a command. It's a colon-separated list of directories.
+    * View your PATH: `echo $PATH`
+2. **`export` command:** Makes a variable available to child processes (sub-shells). Often used to set or modify environment variables like `PATH` for the current session or within scripts.
+    * Example: `export MY_API_KEY="your_secret_key"`
+    * Example (adding to PATH): `export PATH="/opt/custom_app/bin:$PATH"`
+3. **`.bashrc` file:** A script that Bash executes whenever an interactive non-login shell is started (e.g., opening a new terminal window). Used for user-specific aliases, functions, and environment variable settings. Located in the user's home directory (`~/.bashrc`).
+4. **`.bash_profile` (or `~/.profile`, `~/.bash_login`):** A script executed when a user logs in via a login shell. Typically sources `~/.bashrc`.
+5. **`PS1` Environment Variable:** Controls the appearance of your shell prompt. Customizing this can provide useful information at a glance (e.g., current directory, git branch).
+
+### Process Management
+
+1. **`ps` command (process status):** Displays information about currently running processes.
+    * Example: `ps aux` (shows all processes from all users in BSD format)
+    * Example: `ps -ef` (shows all processes in System V format)
+2. **PID (Process ID):** A unique identification number for each running process.
+3. **`htop` command:** An interactive process viewer and system monitor. Provides a more user-friendly and dynamic view of processes, CPU usage, memory, etc., than `ps`. Often needs to be installed (`sudo apt install htop` or `sudo yum install htop`).
+4. **Daemon:** A background process that is not under the direct control of an interactive user. Daemons typically start at boot time and perform system tasks (e.g., web servers, SSH daemon).
+5. **Running a command in the background (`&`):** Appending an ampersand (`&`) to a command will run it in the background, allowing you to continue using the terminal.
+    * Example: `./my_long_script.sh &`
+6. **`cronjob` / `crontab` command:** The `cron` daemon is used to schedule commands or scripts to run periodically at fixed times, dates, or intervals. The `crontab -e` command is used to edit the user's cron jobs.
+    * Example `crontab` entry to run a backup script at 2 AM every day:
+        `0 2 * * * /usr/local/bin/backup_script.sh`
+7. **`kill` command:** Sends a signal to a process, usually to terminate it. Requires the PID of the process.
+    * Default signal is **`SIGTERM` (15)**: Asks the process to terminate gracefully (clean up and exit).
+        * Example: `kill 12345` (where 12345 is the PID)
+8. **`SIGKILL` (9):** A signal that forces the kernel to terminate a process immediately, without giving it a chance to clean up. Use this as a last resort if a process is unresponsive to `SIGTERM`.
+    * Example: `kill -9 12345` or `kill -SIGKILL 12345`
+
+### Text Searching and Manipulation
+
+1. **`grep` (Global Regular Expression Print):** Searches for patterns in text (from files or standard input) and prints the lines that match. Extremely useful for searching log files or command output.
+    * Example: `grep "ERROR" application.log` (finds all lines containing "ERROR")
+    * Example: `ps aux | grep nginx` (finds nginx processes)
+2. **`sed` (Stream Editor):** A powerful utility for performing basic text transformations on an input stream (a file or input from a pipe). It can perform find and replace, deletion, insertion, etc.
+    * Example (simple substitution): `echo "hello world" | sed 's/world/cloud/'` (outputs "hello cloud")
+
+### File Compression and Archiving
+
+1. **`gzip` command:** Compresses files using Lempel-Ziv coding (LZ77). Files compressed with `gzip` usually have a `.gz` extension.
+    * Example: `gzip large_log_file.log` (creates `large_log_file.log.gz` and removes the original)
+    * To decompress: `gunzip large_log_file.log.gz` or `gzip -d large_log_file.log.gz`
+2. **`tar` (Tape Archive) command:** Creates, views, or extracts archive files (often called tarballs). `tar` itself doesn't compress but is often used with `gzip` or `bzip2`.
+    * Create a gzipped archive: `tar -czvf archive_name.tar.gz /path/to/directory`
+        * `c`: create
+        * `z`: use gzip compression
+        * `v`: verbose output
+        * `f`: specify archive filename
+    * Extract a gzipped archive: `tar -xzvf archive_name.tar.gz`
+        * `x`: extract
+
+### Linux Distributions (Distros) & Package Management
+
+1. **Distro (Distribution):** A complete operating system built around the Linux kernel, including a package manager, desktop environment (for desktop versions), and pre-selected software. Examples: Ubuntu, CentOS, Debian, Fedora, Arch Linux.
+2. **Package Managers:** Tools that automate the process of installing, upgrading, configuring, and removing software packages. They handle dependencies automatically.
+    * **APT (Advanced Package Tool):** Used by Debian-based distros (e.g., Ubuntu, Linux Mint). Commands: `apt update`, `apt install <package>`, `apt remove <package>`.
+    * **YUM (Yellowdog Updater, Modified) / DNF (Dandified YUM):** Used by Red Hat-based distros (e.g., CentOS, Fedora, RHEL). Commands: `yum install <package>`, `dnf install <package>`.
+    * **Pacman:** Used by Arch Linux and its derivatives. Commands: `pacman -Syu` (update system), `pacman -S <package>`.
+3. **Release Schedule:**
+    * **Fixed Release:** (e.g., Ubuntu LTS, Debian Stable) New versions are released at regular intervals with long-term support options. Focus on stability.
+    * **Rolling Release:** (e.g., Arch Linux, openSUSE Tumbleweed) Software is continuously updated. Provides the latest software but can sometimes be less stable.
+4. **Desktop Environment:** (More relevant for desktop Linux users, but good to know) Provides the graphical user interface (GUI), including the window manager, panels, icons, etc. Examples: GNOME, KDE Plasma, XFCE. Cloud servers usually run headless (no GUI).
+5. **Major Distro Families:**
+    * **Slackware:** One of the oldest surviving distros, known for its simplicity and adherence to Unix principles.
+    * **Debian:** Very influential; forms the base for many other distros (like Ubuntu). Known for its stability and commitment to free software.
+    * **Red Hat:** Commercially focused (Red Hat Enterprise Linux - RHEL). CentOS (now CentOS Stream) and Fedora are related. Strong in the enterprise server market.
+    * **Arch:** A rolling release distro known for its simplicity (in design, not necessarily ease of use for beginners), flexibility, and the Arch User Repository (AUR).
