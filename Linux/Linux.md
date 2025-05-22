@@ -205,3 +205,104 @@ Linux has a standard file system hierarchy. Here are some important directories 
     * **Debian:** Very influential; forms the base for many other distros (like Ubuntu). Known for its stability and commitment to free software.
     * **Red Hat:** Commercially focused (Red Hat Enterprise Linux - RHEL). CentOS (now CentOS Stream) and Fedora are related. Strong in the enterprise server market.
     * **Arch:** A rolling release distro known for its simplicity (in design, not necessarily ease of use for beginners), flexibility, and the Arch User Repository (AUR).
+
+
+### Networking Essentials
+
+1. **`ip addr` (or `ifconfig` - older, may not be installed by default):** Displays network interface configuration, including IP addresses, MAC addresses, and interface status.
+    * Example: `ip addr show`
+2. **`ping` command:** Sends ICMP ECHO_REQUEST packets to network hosts to test connectivity.
+    * Example: `ping google.com` (Press `Ctrl+C` to stop)
+3. **`netstat -tulnp` (or `ss -tulnp` - newer, preferred):** Shows network connections, listening ports, and the processes using them. Extremely useful for troubleshooting services.
+    * `-t`: TCP ports
+    * `-u`: UDP ports
+    * `-l`: Listening sockets
+    * `-n`: Show numerical addresses (don't resolve hostnames)
+    * `-p`: Show process ID/name using the socket (often requires `sudo`)
+    * Example: `sudo ss -tulnp | grep 80` (shows what's listening on port 80)
+4. **`curl` (Client URL) / `wget`:** Command-line tools for transferring data with URLs. Useful for testing HTTP/S endpoints, downloading files, etc.
+    * Example: `curl http://example.com` (fetches the webpage content)
+    * Example: `wget https://releases.ubuntu.com/22.04/ubuntu-22.04.4-desktop-amd64.iso` (downloads the file)
+5. **Firewall (e.g., `ufw`, `firewalld`, `iptables`):** Cloud environments often have security groups/network ACLs, but the host-based firewall on the Linux instance itself is also important.
+    * **`ufw` (Uncomplicated Firewall):** A user-friendly frontend for `iptables`, common on Ubuntu.
+        * `sudo ufw status`
+        * `sudo ufw allow ssh` (or `sudo ufw allow 22/tcp`)
+        * `sudo ufw enable`
+    * **`firewall-cmd`:** Interface for `firewalld`, common on RHEL-based systems (CentOS, Fedora).
+        * `sudo firewall-cmd --list-all`
+        * `sudo firewall-cmd --permanent --add-service=http`
+        * `sudo firewall-cmd --reload`
+    * **`iptables`:** The underlying powerful, but complex, netfilter firewall utility.
+
+### SSH (Secure Shell)
+
+This is your primary tool for remotely accessing and managing cloud Linux servers.
+
+1. **Connecting to a Server:**
+    * `ssh username@hostname_or_ip`
+    * Example: `ssh ec2-user@192.168.1.100`
+2. **Key-Based Authentication:** Far more secure than password authentication. Involves generating an SSH key pair (public and private key). The public key is placed on the server (in `~/.ssh/authorized_keys`), and you use your private key to authenticate. Cloud providers heavily rely on this.
+3. **SSH Configuration File (`~/.ssh/config`):** Allows you to define aliases and connection parameters for hosts you frequently connect to, simplifying the `ssh` command.
+    * Example entry:
+
+        ```
+        Host my-prod-server
+            HostName 12.34.56.78
+            User ubuntu
+            IdentityFile ~/.ssh/prod_key.pem
+        ```
+
+        Then you can just type `ssh my-prod-server`.
+4. **`scp` (Secure Copy):** Used to securely copy files between your local machine and a remote server (or between two remote servers) over SSH.
+    * Example (local to remote): `scp myfile.txt username@hostname:/remote/directory/`
+    * Example (remote to local): `scp username@hostname:/remote/file.txt /local/directory/`
+5. **`sftp` (Secure File Transfer Protocol):** Provides an interactive FTP-like interface for transferring files securely over SSH.
+
+### Service Management with `systemctl`
+
+Most modern Linux distributions use `systemd` as their init system. `systemctl` is the command to manage services (daemons).
+
+1. **Start a service:** `sudo systemctl start <service_name>` (e.g., `sudo systemctl start nginx`)
+2. **Stop a service:** `sudo systemctl stop <service_name>`
+3. **Restart a service:** `sudo systemctl restart <service_name>`
+4. **Check the status of a service:** `systemctl status <service_name>` (often doesn't require `sudo` just to view status)
+5. **Enable a service to start on boot:** `sudo systemctl enable <service_name>`
+6. **Disable a service from starting on boot:** `sudo systemctl disable <service_name>`
+7. **View service logs (using journald, which `systemd` integrates with):** `sudo journalctl -u <service_name>`
+    * Example: `sudo journalctl -u sshd -f` (-f follows the log)
+
+### Finding Files
+
+1. **`find` command:** A very powerful and flexible command for searching for files and directories based on various criteria (name, type, size, modification time, permissions, etc.).
+    * Example: `find /var/log -name "*.log" -mtime -7` (finds all `.log` files in `/var/log` modified in the last 7 days)
+2. **`locate` command:** Uses a pre-built database to find files by name much faster than `find`. The database needs to be updated periodically (often via `updatedb` run by cron).
+    * Example: `locate myapp.conf`
+
+### Symbolic Links (Symlinks)
+
+1. **`ln -s` command:** Creates a symbolic link (or soft link), which is like a shortcut or pointer to another file or directory.
+    * Example: `ln -s /var/log/app/very_long_path_to_current.log /home/user/current_app.log`
+    * This creates `current_app.log` in the user's home directory that points to the actual log file.
+
+### Quick Note on Text Editors
+
+While the video mentioned Nano, Vim, and Emacs:
+
+* **Nano:** Simple to use, good for quick edits if you're not familiar with Vim/Emacs. Most commands are shown at the bottom of the screen.
+* **Vim (or Vi):** Extremely powerful and efficient once you learn its modal editing paradigm. It's installed on virtually every Linux system, making it invaluable if you have to work on a minimal server. Learning basic Vim navigation and editing (`i` for insert, `Esc` for normal mode, `:w` to write, `:q` to quit, `:wq` to write and quit) is a very good investment.
+
+### Checking Disk Space
+
+1. **`df -h` (disk free):** Shows disk space usage for mounted file systems in a human-readable format.
+2. **`du -sh <directory>` (disk usage):** Shows the total disk space used by a specific directory in a human-readable summary.
+    * Example: `du -sh /var/log/*` (shows sizes of items within /var/log)
+
+### Applying to the Cloud
+
+Remember, as a cloud engineer:
+
+* You'll primarily interact with Linux instances via **SSH**.
+* Understanding **networking, firewalls (both host-based and cloud provider security groups), and service management (`systemctl`)** is crucial for deploying and troubleshooting applications.
+* **Log files in `/var/log`** will be your best friend for debugging.
+* **Scripting with Bash** can automate many repetitive cloud tasks.
+* Cloud providers offer various Linux AMIs/images (e.g., Amazon Linux, Ubuntu, RHEL on AWS/Azure/GCP). While they are standard Linux, they might have some pre-installed cloud-specific tools or configurations.
