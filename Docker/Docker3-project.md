@@ -21,6 +21,49 @@ Below are common Dockerfile instructions and their purposes, applicable to a wid
 - `ENTRYPOINT ["executable", "param1", ...]`
   - Sets the main command for the container, often used in combination with `CMD` for more control.
 
+---
+
+## Building a Docker Image from a Dockerfile
+
+To build a Docker image, use the `docker build` command in your terminal. This command reads the instructions from your Dockerfile and creates an image based on those steps.
+
+**Basic Syntax:**
+
+```
+docker build [options] <path>
+```
+
+- `<path>` is the build context (usually `.` for the current directory).
+
+**Common Options:**
+
+- `-f <dockerfile>`: Specify a different Dockerfile (useful for multiple environments like QA, staging, production).
+- `--force-rm=true`: Remove intermediate containers after a successful or failed build (helps keep things clean).
+- `--rm=false`: Keep intermediate containers if the build fails (useful for debugging).
+- `--no-cache`: Build the image without using cache (forces all steps to run fresh; use if you suspect cache issues).
+
+**Typical Command:**
+
+```
+docker build .
+```
+
+This builds the image using the Dockerfile in the current directory and the current directory as the build context.
+
+**Example with options:**
+
+```
+docker build --force-rm=true -f Dockerfile .
+```
+
+**Tips:**
+
+- The build context includes all files in the specified path, so avoid including unnecessary files (use `.dockerignore`).
+- Use `docker build --help` to see all available options.
+- For CI/CD, you can build from a remote repository URL as the context.
+
+By understanding these options, you can efficiently build, debug, and manage Docker images for any environment.
+
 ### Example: Python Flask Project
 
 ```dockerfile
@@ -63,4 +106,3 @@ COPY --from=builder /app/app .
 # Copy the built Go binary from the builder stage to the runtime image
 CMD ["./app"]                         
 # Set the default command to run the Go application
-```
