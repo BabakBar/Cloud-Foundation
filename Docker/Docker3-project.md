@@ -64,6 +64,72 @@ docker build --force-rm=true -f Dockerfile .
 
 By understanding these options, you can efficiently build, debug, and manage Docker images for any environment.
 
+---
+
+## Searching for Images in Docker Hub
+
+When writing a Dockerfile, you often need to choose a base image. Docker Hub (https://hub.docker.com) is the main public registry for container images. You can search for images directly from the command line using the `docker search` command.
+
+**Basic Syntax:**
+
+```sh
+docker search <image-name>
+```
+
+**Example:**
+
+```sh
+docker search python
+```
+
+This returns a list of available Python images, including their names, descriptions, number of stars (popularity), and whether they are official or automated builds.
+
+**Useful Options:**
+
+- `--filter "is-official=true"` : Show only official images.
+- `--filter "is-automated=true"` : Show only automated builds.
+- `--filter "stars=100"` : Show images with at least 100 stars.
+- `--limit <number>` : Limit the number of results.
+- `--no-trunc` : Show full output without truncating descriptions.
+- `--format` : Format the output using a Go template (e.g., to show only names and descriptions).
+
+**Examples:**
+
+Show only official Python images:
+
+```sh
+docker search python --filter "is-official=true"
+```
+
+Show Python images with at least 100 stars:
+
+```sh
+docker search python --filter "stars=100"
+```
+
+Show top 4 Python images:
+
+```sh
+docker search python --limit 4
+```
+
+Show full descriptions:
+
+```sh
+docker search python --no-trunc
+```
+
+**Tips:**
+
+- Use multiple `--filter` options to combine filters.
+- Use the Docker Hub website to browse images and see all available tags (versions).
+- Avoid using the `latest` tag in production; specify a version for stability.
+- Pull an image with `docker pull <image>:<tag>` (e.g., `docker pull python:3.12`).
+
+By mastering Docker Hub search and image selection, you can find the best and most secure base images for your projects.
+
+---
+
 ### Example: Python Flask Project
 
 ```dockerfile
