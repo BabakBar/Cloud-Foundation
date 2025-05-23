@@ -130,6 +130,185 @@ By mastering Docker Hub search and image selection, you can find the best and mo
 
 ---
 
+## Working with Custom Images
+
+When you pull images from a repository or build your own, Docker saves them locally. You can manage and inspect these images using the `docker image ls` command.
+
+**Basic Syntax:**
+
+```sh
+docker image ls [OPTIONS] [REPOSITORY[:TAG]]
+```
+
+- Lists local Docker images. By default, intermediate images are hidden.
+
+**Useful Options:**
+
+- `-a`, `--all` : Show all images (including intermediate layers).
+- `--no-trunc` : Show full-length image IDs and other fields (no truncation).
+- `-q`, `--quiet` : Show only image IDs (useful for scripting).
+- `--digests` : Display image digests (unique hash for image content).
+- `--filter` : Filter images by criteria (e.g., `dangling=true`, `label=key=value`, `reference=repo:tag`, `before=<image>`, `since=<image>`).
+
+**Examples:**
+
+Show all images, including intermediate layers:
+
+```sh
+docker image ls --all
+```
+
+Show only image IDs:
+
+```sh
+docker image ls --quiet
+```
+
+Show images with full output (no truncation):
+
+```sh
+docker image ls --no-trunc
+```
+
+Show images with their digests:
+
+```sh
+docker image ls --digests
+```
+
+Filter images by repository name:
+
+```sh
+docker image ls --filter "reference=python:*"
+```
+
+Show images created before a specific image:
+
+```sh
+docker image ls --filter "before=<image-id-or-name>"
+```
+
+Show dangling (unused) images:
+
+```sh
+docker image ls --filter "dangling=true"
+```
+
+**Tips:**
+
+- Use multiple filters to narrow down results.
+- The `before` and `since` options compare image creation times (not dates).
+- The VS Code Docker extension can also display your local images visually.
+
+By mastering these options, you can efficiently manage and inspect your custom Docker images.
+
+---
+
+## Tagging and Labeling Images
+
+Tags and labels help organize Docker images for easier management and versioning.
+
+### Tags
+
+Tags identify distinct versions of an image. The standard format is `<repository>:<tag>`, where the tag often includes the version and sometimes the OS or key dependency (e.g., `python:3.12-bookworm`).
+
+- If no tag is specified, Docker uses the `latest` tag by default.
+- It's best practice to explicitly tag images with version numbers and only use `latest` for the most stable release.
+
+**Tagging during build:**
+
+```sh
+docker build -t bigstarcollectibles:1.0 .
+```
+
+- Builds an image named `bigstarcollectibles` with the tag `1.0`.
+- You can add multiple tags to the same image (they will share the same image ID):
+
+```sh
+docker build -t bigstarcollectibles:1.0 -t bigstarcollectibles:latest .
+```
+
+**Tagging an existing image:**
+
+```sh
+docker tag bigstarcollectibles:1.0 bigstarcollectibles:python
+```
+
+- Adds the `python` tag to the existing `bigstarcollectibles:1.0` image.
+
+### Labels
+
+Labels add metadata to images as key-value pairs. Common labels include `vendor`, `version`, and `description`.
+
+**In your Dockerfile:**
+
+```dockerfile
+LABEL "vendor"="Big Star Collectibles" \
+      version="1.0" \
+      description="The Big Star Collectibles Website using the Python base image."
+```
+
+- You can use multiple LABEL instructions or combine them for readability.
+- Use quotes and backslashes for spaces and multi-line values.
+
+**Filtering images by label:**
+
+```sh
+docker image ls --filter "label=vendor=Big Star Collectibles"
+```
+
+- Filters images by label value.
+
+**Tips:**
+
+- Use clear, consistent tags for each release.
+- Always specify a version tag for production images.
+- Use labels to add searchable metadata for easier management.
+
+By tagging and labeling images, you keep your Docker images organized and make it easier to manage versions and metadata, especially in shared repositories.
+
+---
+
+## Working with a Private Image Repository
+
+A private image repository (or registry) lets you securely store and share Docker images with selected users.
+
+- On Docker Hub (or another registry), create a new repository and set its visibility to private or public.
+
+- For private repositories, invite specific users by their Docker Hub username.
+
+- Log in to your registry from the CLI or VS Code:
+
+```sh
+docker login
+```
+
+  Enter your Docker Hub credentials when prompted.
+
+- Tag your image with the registry/repository name before pushing:
+
+```sh
+docker tag bigstarcollectibles:1.0 sbenhoff/big-star-collectibles-repo:1.0
+```
+
+- Push the image to your private repository:
+
+```sh
+docker push sbenhoff/big-star-collectibles-repo:1.0
+```
+
+- Pull the image from your private repository:
+
+```sh
+docker pull sbenhoff/big-star-collectibles-repo:1.0
+```
+
+- You can manage and view your repositories and images using the Registries panel in the Docker extension for VS Code or directly on Docker Hub.
+
+Using a private registry helps keep your images secure while allowing controlled sharing with collaborators.
+
+---
+
 ### Example: Python Flask Project
 
 ```dockerfile
