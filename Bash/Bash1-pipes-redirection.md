@@ -32,3 +32,13 @@ END
 - Standard streams: 0=input, 1=output, 2=error.
 
 ---
+
+## Bash Built-ins vs. External Commands (Cloud Engineering Tip)
+
+- **Built-ins** are commands built into Bash (e.g., `echo`, `cd`, `help`, `enable`). They are always available and run faster.
+- Some commands (like `echo`, `printf`) exist as both built-ins and external programs. Bash uses the built-in by default.
+- Use `command -V <name>` to check if a command is a built-in or external.
+- Force the external version with `command <name> ...`, or the built-in with `builtin <name> ...`.
+- Disable a built-in in your session with `enable -n <name>`, re-enable with `enable <name>`.
+- Use `help` for built-in documentation (e.g., `help echo`).
+- Built-ins are especially useful in minimal/cloud environments where some external commands may be missing.
